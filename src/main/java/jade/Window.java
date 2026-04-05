@@ -4,18 +4,27 @@ import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+import util.Time;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 
-import static org.lwjgl.opengl.GL11.*;
+
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
     private int height,width;
     private String title;
     private long glfwWindow;
+    private float r=0.0f;
+    private float g=0.3f;
+    private float b=0.35f;
+    private float a=1.0f;
+    private boolean FadeToBlack=false;
+    private boolean Cyan=false;
+
     private static Window window=null;
+
     private Window(){
         this.height=1600;
         this.width=2560;
@@ -81,20 +90,26 @@ public class Window {
     }
 
     public void loop(){
+        float targetR = 0.0f;
+        float targetG = 0.3f;
+        float targetB = 0.35f;
+
+        float beginTime= Time.getTime();
+        float endTime=Time.getTime();
+
+
+
         while(!glfwWindowShouldClose(glfwWindow)){
             glfwPollEvents();
 
-            glClearColor(0.0f,0.0f,1.0f,1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
-
-            glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+            glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
 
             // normalize mouse coords to OpenGL (-1 to 1)
             float x = (float)((MouseListener.getX() / width) * 2 - 1);
             float y = (float)(1 - (MouseListener.getY() / height) * 2);
 
-            float size = 0.05f;
+            float size = 0.01f;
 
             glBegin(GL_QUADS);
             glColor3f(1, 1, 1);
@@ -103,10 +118,32 @@ public class Window {
             glVertex2f(x + size, y + size);
             glVertex2f(x - size, y + size);
             glEnd();
+            //mouse box thingie
+            if(KeyListener.isKeyPressed(GLFW_KEY_SPACE)){
+                FadeToBlack=true;
+                Cyan=false;
+            }
+            if(KeyListener.isKeyPressed(GLFW_KEY_B)){
+                Cyan=true;
+                FadeToBlack=false;
+            }
+            if(FadeToBlack){
+                r=Math.max(r-0.01f,0);
+                g=Math.max(g-0.01f,0);
+                b=Math.max(b-0.01f,0);
+            }
+            if (Cyan) {
+                r = Math.min(r + 0.01f, targetR);
+                g = Math.min(g + 0.01f, targetG);
+                b = Math.min(b + 0.01f, targetB);
+            }
 
-            System.out.println(MouseListener.getX() + ", " + MouseListener.getY());
 
             glfwSwapBuffers(glfwWindow);
+
+            endTime=Time.getTime();
+            float dt=endTime-beginTime;
+            beginTime=endTime;
         }
     }
 
