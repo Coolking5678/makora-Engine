@@ -16,20 +16,36 @@ public class Window {
     private int height,width;
     private String title;
     private long glfwWindow;
-    private float r=0.0f;
-    private float g=0.3f;
-    private float b=0.35f;
-    private float a=1.0f;
+    public float r=0.0f;
+    public float g=0.3f;
+    public float b=0.35f;
+    public float a=1.0f;
     private boolean FadeToBlack=false;
     private boolean Cyan=false;
 
     private static Window window=null;
+    public static Scene currentScene;
 
     private Window(){
         this.height=1600;
         this.width=2560;
         this.title="Jojo no kimyou na bouken";
     }
+
+    public static void changeScene(int newScene){
+        switch (newScene){
+            case 0:
+                currentScene=new LevelEditorScene();
+                break;
+            case 1:
+                currentScene=new LevelScene();
+                break;
+            default:
+                assert false:"unknown Scene";
+                break;
+        }
+    }
+
     public static Window get(){
         if(Window.window==null){
             Window.window=new Window();
@@ -87,6 +103,8 @@ public class Window {
         // creates the GLCapabilities instance and makes the OpenGL
         // bindings available for use.
         GL.createCapabilities();
+
+        Window.changeScene(0);
     }
 
     public void loop(){
@@ -97,6 +115,7 @@ public class Window {
         float beginTime= Time.getTime();
         float endTime=Time.getTime();
 
+        float dt=-1.0f;
 
 
         while(!glfwWindowShouldClose(glfwWindow)){
@@ -104,6 +123,9 @@ public class Window {
 
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
+
+            if(dt>=0)
+            currentScene.update(dt);
 
             // normalize mouse coords to OpenGL (-1 to 1)
             float x = (float)((MouseListener.getX() / width) * 2 - 1);
@@ -119,7 +141,7 @@ public class Window {
             glVertex2f(x - size, y + size);
             glEnd();
             //mouse box thingie
-            if(KeyListener.isKeyPressed(GLFW_KEY_SPACE)){
+            if(KeyListener.isKeyPressed(GLFW_KEY_E)){
                 FadeToBlack=true;
                 Cyan=false;
             }
@@ -142,7 +164,7 @@ public class Window {
             glfwSwapBuffers(glfwWindow);
 
             endTime=Time.getTime();
-            float dt=endTime-beginTime;
+            dt=endTime-beginTime;
             beginTime=endTime;
         }
     }
