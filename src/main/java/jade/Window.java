@@ -8,52 +8,52 @@ import util.Time;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
-
-
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
-    private int height,width;
+    private int height, width;
     private String title;
     private long glfwWindow;
-    public float r=0.0f;
-    public float g=0.3f;
-    public float b=0.35f;
-    public float a=1.0f;
-    private boolean FadeToBlack=false;
-    private boolean Cyan=false;
+    public float r = 0.0f;
+    public float g = 0.3f;
+    public float b = 0.35f;
+    public float a = 1.0f;
+    private boolean fadeToBlack = false;
+    private boolean cyan = false;
 
-    private static Window window=null;
-    public static Scene currentScene;
+    private static Window window = null;
+    private static Scene currentScene; // private, better encapsulation
 
-    private Window(){
-        this.height=1600;
-        this.width=2560;
-        this.title="Jojo no kimyou na bouken";
+    private Window() {
+        this.height = 1600;
+        this.width = 2560;
+        this.title = "Jojo no kimyou na bouken";
     }
 
-    public static void changeScene(int newScene){
-        switch (newScene){
+    public static void changeScene(int newScene) {
+        switch (newScene) {
             case 0:
-                currentScene=new LevelEditorScene();
+                currentScene = new LevelEditorScene();
+                // currentScene.init(); // hook for future scene initialization
                 break;
             case 1:
-                currentScene=new LevelScene();
+                currentScene = new LevelScene();
                 break;
             default:
-                assert false:"unknown Scene";
+                assert false : "Unknown scene '" + newScene + "'";
                 break;
         }
     }
 
-    public static Window get(){
-        if(Window.window==null){
-            Window.window=new Window();
+    public static Window get() {
+        if (Window.window == null) {
+            Window.window = new Window();
         }
         return Window.window;
     }
-    public void run(){
-        System.out.println("hewwo LWGJL "+ Version.getVersion() + "!");
+
+    public void run() {
+        System.out.println("hewwo LWGJL " + Version.getVersion() + "!");
         init();
         loop();
 
@@ -63,73 +63,58 @@ public class Window {
         glfwTerminate();
         glfwSetErrorCallback(null).free();
     }
-    public void init(){
-        // error callback its in the name itll output the errors to the terminal
-        // thats what this does duh
+
+    public void init() {
         GLFWErrorCallback.createPrint(System.err).set();
 
-        //start this glfw thingie
-        if(!glfwInit()){
+        if (!glfwInit()) {
             throw new IllegalStateException("unable to do the thingie which is initialize GLFW yuh");
         }
-        //setup
+
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
-        //creation arceus
-        glfwWindow = glfwCreateWindow(this.width,this.height,this.title, NULL, NULL);
-        if ( glfwWindow == NULL )
+        glfwWindow = glfwCreateWindow(this.width, this.height, this.title, NULL, NULL);
+        if (glfwWindow == NULL)
             throw new IllegalStateException("Failed to create the GLFW window");
 
-        //MOUSE and KEY CALLBACKS AND SHI
-        glfwSetCursorPosCallback(glfwWindow,MouseListener::mousePosCallback);
-        glfwSetMouseButtonCallback(glfwWindow,MouseListener::mouseButtonCallback);
-        glfwSetScrollCallback(glfwWindow,MouseListener::mouseScrollCallback);
-        glfwSetKeyCallback(glfwWindow,KeyListener::keyCallback);
+        glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
+        glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
+        glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
+        glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
 
-        //make opengl context curr
         glfwMakeContextCurrent(glfwWindow);
-        //vsync
         glfwSwapInterval(1);
-
-        //window visible now
         glfwShowWindow(glfwWindow);
 
-        // This line is critical for LWJGL's interoperation with GLFW's
-        // OpenGL context, or any context that is managed externally.
-        // LWJGL detects the context that is current in the current thread,
-        // creates the GLCapabilities instance and makes the OpenGL
-        // bindings available for use.
         GL.createCapabilities();
 
         Window.changeScene(0);
     }
 
-    public void loop(){
+    public void loop() {
         float targetR = 0.0f;
         float targetG = 0.3f;
         float targetB = 0.35f;
 
-        float beginTime= Time.getTime();
-        float endTime=Time.getTime();
-
-        float dt=-1.0f;
-
-
-        while(!glfwWindowShouldClose(glfwWindow)){
+        float beginTime = Time.getTime();
+        float endTime;
+        float dt = -1.0f;
+        float fpsTimer = 0.0f;
+        while (!glfwWindowShouldClose(glfwWindow)) {
             glfwPollEvents();
 
             glClearColor(r, g, b, a);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            if(dt>=0)
-            currentScene.update(dt);
+            if (dt >= 0)
+                currentScene.update(dt);
 
-            // normalize mouse coords to OpenGL (-1 to 1)
-            float x = (float)((MouseListener.getX() / width) * 2 - 1);
-            float y = (float)(1 - (MouseListener.getY() / height) * 2);
+            // normalize mouse coords to OpenGL NDC (-1 to 1)
+            float x = (float) ((MouseListener.getX() / width) * 2 - 1);
+            float y = (float) (1 - (MouseListener.getY() / height) * 2);
 
             float size = 0.01f;
 
@@ -140,33 +125,39 @@ public class Window {
             glVertex2f(x + size, y + size);
             glVertex2f(x - size, y + size);
             glEnd();
-            //mouse box thingie
-            if(KeyListener.isKeyPressed(GLFW_KEY_E)){
-                FadeToBlack=true;
-                Cyan=false;
+
+            if (dt >= 0) {
+                fpsTimer += dt;
+                if (fpsTimer >= 10.0f) {
+                    System.out.println("FPS: " + (int)(1.0f / dt));
+                    fpsTimer = 0.0f;
+                }
             }
-            if(KeyListener.isKeyPressed(GLFW_KEY_B)){
-                Cyan=true;
-                FadeToBlack=false;
+
+            if (KeyListener.isKeyPressed(GLFW_KEY_E)) {
+                fadeToBlack = true;
+                cyan = false;
             }
-            if(FadeToBlack){
-                r=Math.max(r-0.01f,0);
-                g=Math.max(g-0.01f,0);
-                b=Math.max(b-0.01f,0);
+            if (KeyListener.isKeyPressed(GLFW_KEY_B)) {
+                cyan = true;
+                fadeToBlack = false;
             }
-            if (Cyan) {
+            if (fadeToBlack) {
+                r = Math.max(r - 0.01f, 0);
+                g = Math.max(g - 0.01f, 0);
+                b = Math.max(b - 0.01f, 0);
+            }
+            if (cyan) {
                 r = Math.min(r + 0.01f, targetR);
                 g = Math.min(g + 0.01f, targetG);
                 b = Math.min(b + 0.01f, targetB);
             }
 
-
             glfwSwapBuffers(glfwWindow);
 
-            endTime=Time.getTime();
-            dt=endTime-beginTime;
-            beginTime=endTime;
+            endTime = Time.getTime();
+            dt = endTime - beginTime;
+            beginTime = endTime;
         }
     }
-
 }
