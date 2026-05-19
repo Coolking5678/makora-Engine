@@ -34,10 +34,11 @@ public class Window {
         switch (newScene) {
             case 0:
                 currentScene = new LevelEditorScene();
-                // currentScene.init(); // hook for future scene initialization
+                currentScene.init();
                 break;
             case 1:
                 currentScene = new LevelScene();
+                currentScene.init();
                 break;
             default:
                 assert false : "Unknown scene '" + newScene + "'";
@@ -112,23 +113,9 @@ public class Window {
             if (dt >= 0)
                 currentScene.update(dt);
 
-            // normalize mouse coords to OpenGL NDC (-1 to 1)
-            float x = (float) ((MouseListener.getX() / width) * 2 - 1);
-            float y = (float) (1 - (MouseListener.getY() / height) * 2);
-
-            float size = 0.01f;
-
-            glBegin(GL_QUADS);
-            glColor3f(1, 1, 1);
-            glVertex2f(x - size, y - size);
-            glVertex2f(x + size, y - size);
-            glVertex2f(x + size, y + size);
-            glVertex2f(x - size, y + size);
-            glEnd();
-
             if (dt >= 0) {
                 fpsTimer += dt;
-                if (fpsTimer >= 10.0f) {
+                if (fpsTimer >= 1.0f) {
                     System.out.println("FPS: " + (int)(1.0f / dt));
                     fpsTimer = 0.0f;
                 }
