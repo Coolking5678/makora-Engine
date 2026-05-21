@@ -40,17 +40,19 @@ public class LevelEditorScene extends Scene {
     private float[] vertexArray={
         //postion             //color
         0.5f,-0.5f,0.0f,    1.0f,0.0f,0.0f,1.0f, //bottright 0
-       -0.5f,0.5f,0.0f,     0.0f,0.0f,1.0f,1.0f,  //topleft 1
-        0.5f,0.5f,0.0f,     0.0f,1.0f,0.0f,1.0f,  //topright 2
-       -0.5f,-0.5f,0.0f,    1.0f,0.0f,1.0f,1.0f  //bottleft 3
-
+       -0.5f,0.5f,0.0f,     1.0f,1.0f,1.0f,1.0f,  //topleft 1
+        0.5f,0.5f,0.0f,     0.0f,0.0f,1.0f,1.0f,  //topright 2
+       -0.5f,-0.5f,0.0f,    1.0f,0.0f,1.0f,1.0f,  //bottleft 3
+        1.0f,0.0f,0.0f,     1.0f,0.0f,1.0f,1.0f,   //farright 4
+        0.0f,0.0f,0.0f,     0.0f,1.0f,0.0f,1.0f,   //center
+        1.0f,1.0f,0.0f,     1.0f,1.0f,0.0f,1.0f    //topright
     };
     //countercockwise
     private int[] elementArray={
 
             2,1,0,//top tri
-            0,1,3//bott tri
-
+            0,1,3,//bott tri
+            4,6,5
 
     };
     private int vaoID,vboID,eboID; 
