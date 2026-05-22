@@ -19,6 +19,6 @@ out vec4 Color;
 
 
 void main(){
-    color = fColor;
+    Color = fColor;
 }
 

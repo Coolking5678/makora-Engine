@@ -56,7 +56,8 @@ public class LevelEditorScene extends Scene {
             4,6,5
 
     };
-    private int vaoID,vboID,eboID; 
+    private int vaoID,vboID,eboID;
+    private Shader pluh;
     public LevelEditorScene() {
 
 
@@ -64,57 +65,8 @@ public class LevelEditorScene extends Scene {
 
     @Override
     public void init(){
-        Shader pluh=new Shader("assets/shaders/default.glsl");
-        // ===================================================
-        // compile and link shaders
-        // ===================================================
-
-        //1 first load and compile the vertex shader
-        vertexId=glCreateShader(GL_VERTEX_SHADER);
-
-        //2 pass it to gupu
-        glShaderSource(vertexId,vertexShaderSrc);
-        glCompileShader(vertexId);
-
-        //check error
-        int success=glGetShaderi(vertexId, GL_COMPILE_STATUS);
-        if (success==GL_FALSE){
-            int len=glGetShaderi(vertexId,GL_INFO_LOG_LENGTH);
-            System.out.println("Error: 'defaultShader.glsl'\n\tVertex shader compilation failed. ");
-            System.out.println(glGetShaderInfoLog(vertexId,len));
-            assert false:"";
-        }
-
-        fragmentId=glCreateShader(GL_FRAGMENT_SHADER);
-
-        //2 pass it to gupu
-        glShaderSource(fragmentId,fragmentShaderSrc);
-        glCompileShader(fragmentId);
-
-        //check error
-        success=glGetShaderi(fragmentId, GL_COMPILE_STATUS);
-        if (success==GL_FALSE){
-            int len=glGetShaderi(fragmentId,GL_INFO_LOG_LENGTH);
-            System.out.println("Error: 'defaultShader.glsl'\n\tFragment shader compilation failed. ");
-            System.out.println(glGetShaderInfoLog(fragmentId,len));
-            assert false:"";
-        }
-
-        //link and check error
-        shaderProgram=glCreateProgram();
-        glAttachShader(shaderProgram,vertexId);
-        glAttachShader(shaderProgram,fragmentId);
-        glLinkProgram(shaderProgram);
-
-        //errors now
-        success=glGetProgrami(shaderProgram,GL_LINK_STATUS);
-        if (success==GL_FALSE){
-            int len=glGetProgrami(shaderProgram,GL_INFO_LOG_LENGTH);
-            System.out.println("Error: 'defaultShader.glsl'\n\tShaderProgram compilation failed. ");
-            System.out.println(glGetProgramInfoLog(shaderProgram,len));
-            assert false:"";
-        }
-        
+        pluh=new Shader("assets/shaders/default.glsl");
+        pluh.compile();
         // ===================================================
         // gen VAO,VBO and EBO buffer objects
         // ===================================================
@@ -154,7 +106,7 @@ public class LevelEditorScene extends Scene {
     @Override
     public void update(float dt) {
         //bind shader program
-        glUseProgram(shaderProgram);
+        pluh.use();
         //bind VAO
         glBindVertexArray(vaoID);
 
@@ -170,7 +122,7 @@ public class LevelEditorScene extends Scene {
         glDisableVertexAttribArray(1);
 
         glBindVertexArray(0);
-        glUseProgram(0);
+        pluh.detach();
 
     }
 }
