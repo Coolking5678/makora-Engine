@@ -1,6 +1,7 @@
 package jade;
 
 import org.lwjgl.BufferUtils;
+import renderer.Shader;
 
 import java.awt.event.KeyEvent;
 import java.nio.FloatBuffer;
@@ -58,10 +59,12 @@ public class LevelEditorScene extends Scene {
     private int vaoID,vboID,eboID; 
     public LevelEditorScene() {
 
+
     }
 
     @Override
     public void init(){
+        Shader pluh=new Shader("assets/shaders/default.glsl");
         // ===================================================
         // compile and link shaders
         // ===================================================
