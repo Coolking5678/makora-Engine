@@ -14,10 +14,10 @@ public class Window {
     private int height, width;
     private String title;
     private long glfwWindow;
-    public float r = 0.0f;
-    public float g = 0.3f;
-    public float b = 0.35f;
-    public float a = 1.0f;
+    public float r = 0.5f;
+    public float g = 0.5f;
+    public float b = 0.5f;
+    public float a = 0.5f;
     private boolean fadeToBlack = false;
     private boolean cyan = false;
 
@@ -96,9 +96,6 @@ public class Window {
     }
 
     public void loop() {
-        float targetR = 0.0f;
-        float targetG = 0.3f;
-        float targetB = 0.35f;
 
         float beginTime = Time.getTime();
         float endTime;
@@ -121,24 +118,6 @@ public class Window {
                 }
             }
 
-            if (KeyListener.isKeyPressed(GLFW_KEY_E)) {
-                fadeToBlack = true;
-                cyan = false;
-            }
-            if (KeyListener.isKeyPressed(GLFW_KEY_B)) {
-                cyan = true;
-                fadeToBlack = false;
-            }
-            if (fadeToBlack) {
-                r = Math.max(r - 0.01f, 0);
-                g = Math.max(g - 0.01f, 0);
-                b = Math.max(b - 0.01f, 0);
-            }
-            if (cyan) {
-                r = Math.min(r + 0.01f, targetR);
-                g = Math.min(g + 0.01f, targetG);
-                b = Math.min(b + 0.01f, targetB);
-            }
 
             glfwSwapBuffers(glfwWindow);
 
