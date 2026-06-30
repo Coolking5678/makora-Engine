@@ -18,8 +18,6 @@ public class Window {
     public float g = 0.5f;
     public float b = 0.5f;
     public float a = 0.5f;
-    private boolean fadeToBlack = false;
-    private boolean cyan = false;
 
     private static Window window = null;
     private static Scene currentScene; // private, better encapsulation

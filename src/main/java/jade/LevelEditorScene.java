@@ -41,10 +41,10 @@ public class LevelEditorScene extends Scene {
 
     private float[] vertexArray={
         //postion             //color
-        0.5f,-0.5f,0.0f,    1.0f,0.0f,0.0f,1.0f, //bottright 0
-       -0.5f,0.5f,0.0f,     1.0f,1.0f,1.0f,1.0f,  //topleft 1
-        0.5f,0.5f,0.0f,     0.0f,0.0f,1.0f,1.0f,  //topright 2
-       -0.5f,-0.5f,0.0f,    1.0f,0.0f,1.0f,1.0f,  //bottleft 3
+        200.5f,100.5f,0.0f,    1.0f,0.0f,0.0f,1.0f, //bottright 0
+        0.5f,200.5f,0.0f,     1.0f,1.0f,1.0f,1.0f,  //topleft 1
+        200.5f,200.5f,0.0f,     0.0f,0.0f,1.0f,1.0f,  //topright 2
+        0.5f,100.5f,0.0f,    1.0f,0.0f,1.0f,1.0f,  //bottleft 3
 
     };
     //countercockwise
@@ -104,6 +104,9 @@ public class LevelEditorScene extends Scene {
 
     @Override
     public void update(float dt) {
+
+        camera.position.x-=dt*50.0f;
+
         //bind shader program
         pluh.use();
         pluh.uploadMat4f("uProjection",camera.getProjectionMatrix());
